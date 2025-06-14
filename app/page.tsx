@@ -1,103 +1,224 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useRef, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Music, VolumeX } from "lucide-react";
+import Activity1 from "@/components/activities/Activity1";
+import Activity2 from "@/components/activities/Activity2";
+import Activity3 from "@/components/activities/Activity3";
+import Activity4 from "@/components/activities/Activity4";
+import Activity5 from "@/components/activities/Activity5";
+
+type AnimalNumber = {
+  id: string;
+  type: "number" | "image"; // <- literal types, không phải string
+  number: number;
+  animal?: string;
+  image?: string;
+};
+
+export default function MathGame() {
+  const [activity, setActivity] = useState(1);
+  const [unlockedActivities, setUnlockedActivities] = useState([1]); // Theo dõi các hoạt động đã mở khóa
+  const [selectedCards, setSelectedCards] = useState<number[]>([]);
+  const [feedback, setFeedback] = useState("");
+  const [showConclusion, setShowConclusion] = useState(false);
+  const [selectedNumber, setSelectedNumber] = useState("");
+  const [evenNumbers, setEvenNumbers] = useState<number[]>([]);
+  const [oddNumbers, setOddNumbers] = useState<number[]>([]);
+  const [dragNumbers, setDragNumbers] = useState([4, 7, 5, 8]);
+  const [largestEven, setLargestEven] = useState("");
+  const [largestOdd, setLargestOdd] = useState("");
+  const [animalNumbers, setAnimalNumbers] = useState<AnimalNumber[]>([
+    { id: "51", type: "number", number: 51 },
+    { id: "cat-1", type: "image", number: 52, animal: "cat", image: "/imgs/cat.jpg" },
+    { id: "53", type: "number", number: 53 },
+    { id: "54", type: "number", number: 54 },
+    { id: "55", type: "number", number: 55 },
+    { id: "fish-1", type: "image", number: 56, animal: "fish", image: "/imgs/fish.webp" },
+    { id: "57", type: "number", number: 57 },
+    { id: "58", type: "number", number: 58 },
+    { id: "59", type: "number", number: 59 },
+    { id: "monkey-1", type: "image", number: 60, animal: "monkey", image: "/imgs/monkey.jpg" },
+    { id: "tiger-1", type: "image", number: 61, animal: "tiger", image: "/imgs/tiger.jpg" },
+    { id: "62", type: "number", number: 62 },
+    { id: "63", type: "number", number: 63 },
+    { id: "dog-1", type: "image", number: 64, animal: "dog", image: "/imgs/dog.jpg" },
+    { id: "65", type: "number", number: 65 },
+    { id: "66", type: "number", number: 66 },
+    { id: "bear-1", type: "image", number: 67, animal: "bear", image: "/imgs/bear.jpg" },
+    { id: "68", type: "number", number: 68 },
+    { id: "snake-1", type: "image", number: 69, animal: "snake", image: "/imgs/snake.jpg" },
+    { id: "70", type: "number", number: 70 },
+    { id: "71", type: "number", number: 71 },
+    { id: "72", type: "number", number: 72 },
+    { id: "lion-1", type: "image", number: 73, animal: "lion", image: "/imgs/lion.jpg" },
+    { id: "74", type: "number", number: 74 },
+    { id: "75", type: "number", number: 75 },
+    { id: "76", type: "number", number: 76 },
+    { id: "77", type: "number", number: 77 },
+    { id: "bug-1", type: "image", number: 78, animal: "bug", image: "/imgs/bug.webp" },
+    { id: "79", type: "number", number: 79 },
+    { id: "80", type: "number", number: 80 },
+  ]);
+  const [streetNumbers, setStreetNumbers] = useState("");
+  const [isMusicPlaying, setIsMusicPlaying] = useState(true);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Handle music play/pause based on isMusicPlaying
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      if (isMusicPlaying) {
+        audio.play().catch((error) => {
+          console.log("Autoplay prevented:", error);
+          setIsMusicPlaying(false); // Disable if autoplay fails
+        });
+      } else {
+        audio.pause();
+      }
+    }
+  }, [isMusicPlaying]);
+
+  // Unlock the next activity when the current one is completed
+  useEffect(() => {
+    if (!unlockedActivities.includes(activity + 1)) {
+      setUnlockedActivities((prev) => {
+        const nextActivity = activity + 1;
+        if (nextActivity <= 5 && !prev.includes(nextActivity)) {
+          return [...prev, nextActivity];
+        }
+        return prev;
+      });
+    }
+  }, [activity, unlockedActivities]);
+
+  // Toggle music play/pause
+  const toggleMusic = () => {
+    setIsMusicPlaying((prev) => !prev);
+  };
+
+  // Handle navigation button click
+  const handleNavClick = (targetActivity: number) => {
+    if (unlockedActivities.includes(targetActivity)) {
+      setActivity(targetActivity);
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen bg-gradient-to-br from-blue-200 to-pink-200 flex items-center justify-center p-4">
+      <Card className="w-full max-w-6xl relative">
+        {/* Music toggle button */}
+        <div className="absolute top-4 right-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleMusic}
+            aria-label={isMusicPlaying ? "Tắt nhạc nền" : "Bật nhạc nền"}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {isMusicPlaying ? <Music className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+          </Button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <CardHeader>
+          <CardTitle className="text-5xl font-bold text-center">
+            Số Chẵn & Số Lẻ
+          </CardTitle>
+          <CardTitle className="text-5xl font-bold text-center underline">
+            Lớp 4
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {/* Navigation Bar */}
+          <div className="flex justify-center space-x-4 mb-8">
+            {[1, 2, 3, 4, 5].map((act) => (
+              <Button
+                key={act}
+                onClick={() => handleNavClick(act)}
+                disabled={!unlockedActivities.includes(act)}
+                className={`${
+                  activity === act
+                    ? "bg-blue-600 text-white"
+                    : unlockedActivities.includes(act)
+                    ? "bg-blue-400 hover:bg-blue-500 text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                } px-6 py-2 text-lg font-semibold rounded-full transition-all`}
+              >
+                Hoạt động {act}
+              </Button>
+            ))}
+          </div>
+
+          {activity === 1 && (
+            <Activity1
+              selectedCards={selectedCards}
+              setSelectedCards={setSelectedCards}
+              feedback={feedback}
+              setFeedback={setFeedback}
+              setActivity={setActivity}
+            />
+          )}
+          {activity === 2 && (
+            <Activity2
+              selectedNumber={selectedNumber}
+              setSelectedNumber={setSelectedNumber}
+              feedback=""
+              setFeedback={setFeedback}
+              showConclusion={showConclusion}
+              setShowConclusion={setShowConclusion}
+              setActivity={setActivity}
+            />
+          )}
+          {activity === 3 && (
+            <Activity3
+              evenNumbers={evenNumbers}
+              setEvenNumbers={setEvenNumbers}
+              feedback={feedback}
+              setFeedback={setFeedback}
+              showConclusion={showConclusion}
+              setShowConclusion={setShowConclusion}
+              setActivity={setActivity}
+            />
+          )}
+          {(activity === 4 || activity === 4.2 || activity === 4.3 || activity === 4.4) && (
+            <Activity4
+              activity={activity}
+              setActivity={setActivity}
+              oddNumbers={oddNumbers}
+              setOddNumbers={setOddNumbers}
+              feedback={feedback}
+              setFeedback={setFeedback}
+              dragNumbers={dragNumbers}
+              setDragNumbers={setDragNumbers}
+              largestEven={largestEven}
+              setLargestEven={setLargestEven}
+              largestOdd={largestOdd}
+              setLargestOdd={setLargestOdd}
+              animalNumbers={animalNumbers}
+              setAnimalNumbers={setAnimalNumbers}
+            />
+          )}
+          {activity === 5 && (
+            <Activity5
+              streetNumbers={streetNumbers}
+              setStreetNumbers={setStreetNumbers}
+              feedback={feedback}
+              setFeedback={setFeedback}
+            />
+          )}
+        </CardContent>
+      </Card>
+      {/* Audio element for background music */}
+      <audio ref={audioRef} loop>
+        <source src="./sounds/bg.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
     </div>
   );
 }
