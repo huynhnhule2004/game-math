@@ -75,7 +75,7 @@ export default function Activity2({
           className="text-center mb-8"
         >
           <h1 className="pb-2 text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Hoạt động 2: "Số chia hết"
+            Hoạt động 2: &quot;Số chia hết&quot;
           </h1>
         </motion.div>
 

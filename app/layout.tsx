@@ -1,12 +1,9 @@
 "use client";
 
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Monitor, Smartphone, AlertTriangle, X, ArrowRight } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +28,7 @@ export default function RootLayout({
   useEffect(() => {
     const checkMobile = () => {
       const isMobileDevice = window.innerWidth < 768;
-      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const userAgent = navigator.userAgent || navigator.vendor || "";
       const isMobileAgent = /android|iphone|ipod|ipad|mobile/i.test(userAgent);
       setIsMobile(isMobileDevice || isMobileAgent);
     };

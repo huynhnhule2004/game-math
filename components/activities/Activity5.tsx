@@ -13,8 +13,6 @@ interface Activity5Props {
 }
 
 export default function Activity5({
-  streetNumbers,
-  setStreetNumbers,
   feedback,
   setFeedback,
 }: Activity5Props) {
@@ -96,7 +94,7 @@ export default function Activity5({
         className="mb-8 relative"
       >
         <div className="bg-white p-4 rounded-2xl shadow-lg">
-          <div className="relative overflow-hidden rounded-xl">
+            <div className="relative overflow-hidden rounded-xl">
             <img
               src="/imgs/street.jpg"
               alt="Đường phố với các ngôi nhà"

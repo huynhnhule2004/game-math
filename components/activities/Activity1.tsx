@@ -4,15 +4,6 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-// Ensure tsconfig.json includes:
-// {
-//   "compilerOptions": {
-//     "jsx": "react-jsx",
-//     "module": "esnext",
-//     "moduleResolution": "node"
-//   }
-// }
-// Also, ensure `framer-motion` is installed: `npm install framer-motion`
 
 interface Activity1Props {
   selectedCards: number[];
@@ -34,7 +25,7 @@ export default function Activity1({
   // Sound effects function
   const playSound = (type: "correct" | "wrong" | "select") => {
     try {
-      const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const context = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       const oscillator = context.createOscillator();
       const gainNode = context.createGain();
 
@@ -63,7 +54,7 @@ export default function Activity1({
         oscillator.start(context.currentTime);
         oscillator.stop(context.currentTime + 0.1);
       }
-    } catch (e) {
+    } catch {
       console.log("Audio not supported");
     }
   };
@@ -73,7 +64,7 @@ export default function Activity1({
     try {
       const audio = new Audio("/sounds/correct.mp3");
       audio.play().catch((e) => console.log("Error playing modal sound:", e));
-    } catch (e) {
+    } catch {
       console.log("Audio not supported for modal sound");
     }
   };
@@ -245,7 +236,7 @@ export default function Activity1({
               ease: "easeInOut"
             }}
           >
-            🐱 Hoạt động 1: "Chia cá cho mèo" 🐟
+            🐱 Hoạt động 1: &quot;Chia cá for mèo&quot; 🐟
             
           </motion.h2>
         </motion.div>

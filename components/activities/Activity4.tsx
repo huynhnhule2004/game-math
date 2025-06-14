@@ -102,7 +102,6 @@ export default function Activity4({
   setDragNumbers,
   largestEven,
   setLargestEven,
-  largestOdd,
   setLargestOdd,
   animalNumbers,
   setAnimalNumbers,
