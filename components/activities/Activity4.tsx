@@ -14,6 +14,7 @@ import { DndContext, closestCenter, DragEndEvent, useDroppable } from "@dnd-kit/
 import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Lightbulb, X } from "lucide-react";
+import Image from "next/image";
 
 interface AnimalNumber {
   id: string;
@@ -59,15 +60,7 @@ const SortableItem = ({ id }: { id: number }) => {
   );
 };
 
-const SortableAnimalItem = ({
-  id,
-  number,
-  animal,
-}: {
-  id: string;
-  number: number;
-  animal: string;
-}) => {
+const SortableAnimalItem = ({ id, type, number, image, animal }: AnimalNumber) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -79,9 +72,21 @@ const SortableAnimalItem = ({
       style={style}
       {...attributes}
       {...listeners}
-      className="p-4 border rounded-lg bg-white"
+      className="p-4 border rounded-lg bg-white flex items-center justify-center"
     >
-      {number} - {animal}
+      {type === "number" ? (
+        <span className="text-lg font-semibold">{number}</span>
+      ) : (
+        image && (
+          <Image
+            src={image}
+            alt={animal || "animal"}
+            width={32}
+            height={32}
+            className="object-contain"
+          />
+        )
+      )}
     </div>
   );
 };
@@ -108,10 +113,11 @@ export default function Activity4({
     q3: "",
     q3_type: "",
   });
-  const [evenAnimals, setEvenAnimals] = useState<any[]>([]);
-  const [oddAnimals, setOddAnimals] = useState<any[]>([]);
+  const [evenAnimals, setEvenAnimals] = useState<AnimalNumber[]>([]);
+  const [oddAnimals, setOddAnimals] = useState<AnimalNumber[]>([]);
   const [showHint, setShowHint] = useState(false);
   const [wrongNumbers, setWrongNumbers] = useState<number[]>([]);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   // Initialize audio objects
   const correctSound = typeof Audio !== "undefined" ? new Audio("/sounds/correct.mp3") : null;
@@ -122,59 +128,8 @@ export default function Activity4({
     setFeedback("");
   }, [activity, setFeedback]);
 
-  const SortableItem = ({ id }: { id: number }) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-    return (
-      <motion.div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className="p-4 border rounded-lg bg-white"
-      >
-        {id}
-      </motion.div>
-    );
-  };
-  
-  const SortableAnimalItem = ({ id, type, number, image, animal }: AnimalNumber) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className="p-4 border rounded-lg bg-white flex items-center justify-center"
-      >
-        {type === "number" ? (
-          <span className="text-lg font-semibold">{number}</span>
-        ) : (
-          image && (
-            <img
-              src={image}
-              alt={animal || "animal"}
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-          )
-        )}
-      </div>
-    );
-  };
-
   const handleOddSelect = (num: number) => {
     if (num % 2 !== 0) {
-      // Play correct sound
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
@@ -182,7 +137,6 @@ export default function Activity4({
       setWrongNumbers(wrongNumbers.filter((n) => n !== num));
       setFeedback("");
     } else {
-      // Play wrong sound
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
       }
@@ -202,13 +156,11 @@ export default function Activity4({
       answers4_2.q3 === "6" &&
       answers4_2.q3_type === "chẵn"
     ) {
-      // Play correct sound
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
       setFeedback("Đúng rồi!");
     } else {
-      // Play wrong sound
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
       }
@@ -230,21 +182,18 @@ export default function Activity4({
   const checkActivity4_3 = () => {
     const number = parseInt(dragNumbers.join(""));
     if (number === 8754 && largestEven === "") {
-      // Play correct sound
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
       setLargestEven("8754");
       setFeedback("Tuyệt vời! Số chẵn lớn nhất là 8754.");
     } else if (number === 8745 && largestEven !== "") {
-      // Play correct sound
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
       setLargestOdd("8745");
       setFeedback("Tuyệt vời! Số lẻ lớn nhất là 8745.");
     } else {
-      // Play wrong sound
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
       }
@@ -255,7 +204,6 @@ export default function Activity4({
   const handleAnimalDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) {
-      // Play wrong sound
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
       }
@@ -264,30 +212,26 @@ export default function Activity4({
     }
     const item = animalNumbers.find((a) => a.id === active.id);
     if (!item) {
-      // Play wrong sound
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
       }
-      setFeedback("Không tìm thấy con vật!");
+      setFeedback("Không tìm thấy mục!");
       return;
     }
 
     if (over.id === "even" && item.number % 2 === 0) {
-      // Play correct sound
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
       setEvenAnimals([...evenAnimals, item]);
       setAnimalNumbers(animalNumbers.filter((a) => a.id !== item.id));
     } else if (over.id === "odd" && item.number % 2 !== 0) {
-      // Play correct sound
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
       setOddAnimals([...oddAnimals, item]);
       setAnimalNumbers(animalNumbers.filter((a) => a.id !== item.id));
     } else {
-      // Play wrong sound
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
       }
@@ -298,12 +242,11 @@ export default function Activity4({
     const totalAnimals = animalNumbers.length + evenAnimals.length + oddAnimals.length;
     const classifiedCount = evenAnimals.length + oddAnimals.length + 1;
     if (classifiedCount === totalAnimals) {
-      // Play correct sound
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
       setFeedback("Tuyệt vời! Bạn đã phân loại đúng tất cả!");
-      setTimeout(() => setActivity(5), 2000);
+      setShowCompletionModal(true); // Hiển thị modal thay vì chuyển thẳng sang Activity 5
     }
   };
 
@@ -910,6 +853,44 @@ export default function Activity4({
                   </Button>
                 </div>
                 {hintContent}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Completion Modal */}
+        <AnimatePresence>
+          {showCompletionModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.8, opacity: 0, y: 20 }}
+                className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center justify-center gap-2">
+                    🎉 Chúc mừng!
+                  </h3>
+                  <p className="text-lg text-gray-600 mb-6">
+                    Bạn đã hoàn thành Hoạt động 4! Sẵn sàng cho thử thách tiếp theo?
+                  </p>
+                  <Button
+                    onClick={() => {
+                      setShowCompletionModal(false);
+                      setActivity(5);
+                    }}
+                    className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
+                  >
+                    Tiếp tục
+                  </Button>
+                </div>
               </motion.div>
             </motion.div>
           )}

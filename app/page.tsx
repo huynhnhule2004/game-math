@@ -208,7 +208,7 @@ export default function MathGame() {
             <Activity5
               streetNumbers={streetNumbers}
               setStreetNumbers={setStreetNumbers}
-              feedback={feedback}
+              feedback=''
               setFeedback={setFeedback}
             />
           )}
