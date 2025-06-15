@@ -552,7 +552,7 @@ export default function Activity4({
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.8, opacity: 0, y: 20 }}
                 className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
-                onClick={(e) => estopPropagation()}
+                onClick={() => estopPropagation()}
               >
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
