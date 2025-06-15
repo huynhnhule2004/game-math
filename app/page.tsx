@@ -16,6 +16,7 @@ type AnimalNumber = {
   number: number;
   animal?: string;
   image?: string;
+  isPlaced?: boolean;
 };
 
 export default function MathGame() {

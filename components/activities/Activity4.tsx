@@ -15,6 +15,7 @@ import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Lightbulb, X } from "lucide-react";
 import Image from "next/image";
+import { CSSProperties } from "react";
 
 interface AnimalNumber {
   id: string;
@@ -22,6 +23,7 @@ interface AnimalNumber {
   number: number;
   animal?: string;
   image?: string;
+  isPlaced?: boolean;
 }
 
 interface Activity4Props {
@@ -60,11 +62,14 @@ const SortableItem = ({ id }: { id: number }) => {
   );
 };
 
-const SortableAnimalItem = ({ id, type, number, image, animal }: AnimalNumber) => {
+const SortableAnimalItem = ({ id, type, number, image, animal, isPlaced }: AnimalNumber) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-  const style = {
+  const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
+    visibility: isPlaced ? "hidden" : "visible", 
+    height: "64px",
+    width: "64px",
   };
   return (
     <div
@@ -87,6 +92,20 @@ const SortableAnimalItem = ({ id, type, number, image, animal }: AnimalNumber) =
           />
         )
       )}
+    </div>
+  );
+};
+
+const Droppable = ({ id, children, title }: { id: string; children: React.ReactNode; title: string }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`p-6 border-2 rounded-xl bg-white/80 min-h-[200px] shadow-sm flex flex-col ${isOver ? "bg-yellow-100 border-yellow-400" : "border-teal-300"
+        }`}
+    >
+      <h3 className="text-lg font-semibold text-teal-700 mb-4">{title}</h3>
+      <div className="flex-1 overflow-y-auto max-h-[300px]">{children}</div>
     </div>
   );
 };
@@ -209,8 +228,9 @@ export default function Activity4({
       setFeedback("Thả vào ô số chẵn hoặc số lẻ!");
       return;
     }
-    const item = animalNumbers.find((a) => a.id === active.id);
-    if (!item) {
+
+    const itemIndex = animalNumbers.findIndex((a) => a.id === active.id);
+    if (itemIndex === -1) {
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
       }
@@ -218,18 +238,23 @@ export default function Activity4({
       return;
     }
 
+    const item = animalNumbers[itemIndex];
+    const updatedAnimalNumbers = [...animalNumbers];
+
     if (over.id === "even" && item.number % 2 === 0) {
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
+      updatedAnimalNumbers[itemIndex] = { ...item, isPlaced: true };
       setEvenAnimals([...evenAnimals, item]);
-      setAnimalNumbers(animalNumbers.filter((a) => a.id !== item.id));
+      setFeedback("");
     } else if (over.id === "odd" && item.number % 2 !== 0) {
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
+      updatedAnimalNumbers[itemIndex] = { ...item, isPlaced: true };
       setOddAnimals([...oddAnimals, item]);
-      setAnimalNumbers(animalNumbers.filter((a) => a.id !== item.id));
+      setFeedback("Tuyệt vời! Bạn đã phân loại đúng!");
     } else {
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
@@ -238,14 +263,16 @@ export default function Activity4({
       return;
     }
 
-    const totalAnimals = animalNumbers.length + evenAnimals.length + oddAnimals.length;
-    const classifiedCount = evenAnimals.length + oddAnimals.length + 1;
+    setAnimalNumbers(updatedAnimalNumbers);
+
+    const totalAnimals = animalNumbers.length;
+    const classifiedCount = updatedAnimalNumbers.filter((item) => item.isPlaced).length;
     if (classifiedCount === totalAnimals) {
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
       setFeedback("Tuyệt vời! Bạn đã phân loại đúng tất cả!");
-      setShowCompletionModal(true); // Hiển thị modal thay vì chuyển thẳng sang Activity 5
+      setShowCompletionModal(true);
     }
   };
 
@@ -361,8 +388,8 @@ export default function Activity4({
                   ${isSelected
                     ? "bg-gradient-to-br from-green-400 to-green-500 text-white shadow-lg ring-4 ring-green-200 border-green-300"
                     : isWrong
-                    ? "bg-gradient-to-br from-red-400 to-red-500 text-white shadow-lg border-red-300"
-                    : "bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg border-gray-200 hover:border-purple-300"
+                      ? "bg-gradient-to-br from-red-400 to-red-500 text-white shadow-lg border-red-300"
+                      : "bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg border-gray-200 hover:border-purple-300"
                   }
                 `}
                 onClick={() => !isSelected && handleOddSelect(num)}
@@ -371,16 +398,16 @@ export default function Activity4({
                 animate={
                   isSelected
                     ? {
-                        scale: [1, 1.1, 1],
-                        rotate: [0, 5, -5, 0],
-                        transition: { duration: 0.6, ease: "easeOut" },
-                      }
+                      scale: [1, 1.1, 1],
+                      rotate: [0, 5, -5, 0],
+                      transition: { duration: 0.6, ease: "easeOut" },
+                    }
                     : isWrong
-                    ? {
+                      ? {
                         x: [-5, 5, -5, 5, 0],
                         transition: { duration: 0.4 },
                       }
-                    : {}
+                      : {}
                 }
                 layout
               >
@@ -463,11 +490,10 @@ export default function Activity4({
               className="text-center mb-6"
             >
               <div
-                className={`${
-                  feedback.includes("❌")
+                className={`${feedback.includes("❌")
                     ? "bg-red-100 border-red-300 text-red-700"
                     : "bg-green-100 border-green-300 text-green-700"
-                } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
+                  } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
               >
                 <span>{feedback}</span>
               </div>
@@ -495,6 +521,10 @@ export default function Activity4({
   }
 
   if (activity === 4.2) {
+    function estopPropagation(): void {
+      throw new Error("Function not implemented.");
+    }
+
     return (
       <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg relative">
         {/* Light Bulb Hint Button */}
@@ -522,7 +552,7 @@ export default function Activity4({
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.8, opacity: 0, y: 20 }}
                 className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => estopPropagation()}
               >
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -624,11 +654,10 @@ export default function Activity4({
               className="text-center mt-6"
             >
               <div
-                className={`${
-                  feedback.includes("Đúng")
+                className={`${feedback.includes("Đúng")
                     ? "bg-green-100 border-green-300 text-green-700"
                     : "bg-red-100 border-red-300 text-red-700"
-                } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
+                  } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
               >
                 <span>{feedback}</span>
               </div>
@@ -681,7 +710,11 @@ export default function Activity4({
               <motion.div
                 initial={{ scale: 0.8, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.8, opacity: 0, y: 20 }}
+                exit={{
+                  scale: 0.8, opacity: 0, y:
+
+                    20
+                }}
                 className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -747,11 +780,10 @@ export default function Activity4({
               className="text-center mb-6"
             >
               <div
-                className={`${
-                  feedback.includes("Tuyệt vời")
+                className={`${feedback.includes("Tuyệt vời")
                     ? "bg-green-100 border-green-300 text-green-700"
                     : "bg-red-100 border-red-300 text-red-700"
-                } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
+                  } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
               >
                 <span>{feedback}</span>
               </div>
@@ -763,7 +795,7 @@ export default function Activity4({
         <div className="text-center">
           <Button
             onClick={checkActivity4_3}
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
+            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow,lg"
           >
             Kiểm tra
           </Button>
@@ -788,27 +820,10 @@ export default function Activity4({
     );
   }
 
-  // Component Droppable để tạo vùng thả
-  const Droppable = ({ id, children, title }: { id: string; children: React.ReactNode; title: string }) => {
-    const { setNodeRef, isOver } = useDroppable({ id });
-    return (
-      <div
-        ref={setNodeRef}
-        className={`p-6 border-2 rounded-xl bg-white/80 min-h-[200px] shadow-sm flex flex-col ${
-          isOver ? "bg-yellow-100 border-yellow-400" : "border-teal-300"
-        }`}
-      >
-        <h3 className="text-lg font-semibold text-teal-700 mb-4">{title}</h3>
-        <div className="flex-1 overflow-y-auto max-h-[300px]">{children}</div>
-      </div>
-    );
-  };
-
-  // Hoạt động 4.4
   if (activity === 4.4) {
-    // Tính tổng số mục để hiển thị tiến độ chính xác
-    const totalAnimals = animalNumbers.length + evenAnimals.length + oddAnimals.length;
-    const classifiedCount = evenAnimals.length + oddAnimals.length;
+    // Calculate progress
+    const totalAnimals = animalNumbers.length;
+    const classifiedCount = animalNumbers.filter((item) => item.isPlaced).length;
 
     return (
       <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl shadow-lg relative">
@@ -829,9 +844,7 @@ export default function Activity4({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-              onClick={() => setShowHint(false)}
-            >
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4,">
               <motion.div
                 initial={{ scale: 0.8, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -929,47 +942,93 @@ export default function Activity4({
 
         {/* Draggable Animal Items and Drop Zones */}
         <DndContext collisionDetection={closestCenter} onDragEnd={handleAnimalDragEnd}>
-          <div className="grid grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Even Numbers Zone */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <Droppable id="even" title="Số chẵn">
-              {evenAnimals.map((item) => (
-                <SortableAnimalItem
-                  key={item.id}
-                  id={item.id}
-                  type={item.type}
-                  number={item.number}
-                  animal={item.animal}
-                  image={item.image}
-                />
-              ))}
+              <div className="min-h-[200px] bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-6 shadow-inner border-2 border-dashed border-blue-300">
+                <h3 className="text-2xl font-bold text-blue-700 mb-4 text-center flex items-center justify-center gap-2">
+                  <span className="text-3xl">🔢</span>
+                  Số chẵn
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[120px]">
+                  {evenAnimals.map((item) => (
+                    <div key={item.id} className="aspect-square">
+                      <SortableAnimalItem
+                        id={item.id}
+                        type={item.type}
+                        number={item.number}
+                        animal={item.animal}
+                        image={item.image}
+                        isPlaced={item.isPlaced}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </Droppable>
+          </motion.div>
+
+          {/* Odd Numbers Zone */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
             <Droppable id="odd" title="Số lẻ">
-              {oddAnimals.map((item) => (
-                <SortableAnimalItem
-                  key={item.id}
-                  id={item.id}
-                  type={item.type}
-                  number={item.number}
-                  animal={item.animal}
-                  image={item.image}
-                />
-              ))}
+              <div className="min-h-[200px] bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl p-6 shadow-inner border-2 border-dashed border-purple-300">
+                <h3 className="text-2xl font-bold text-purple-700 mb-4 text-center flex items-center justify-center gap-2">
+                  <span className="text-3xl">🎲</span>
+                  Số lẻ
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[120px]">
+                  {oddAnimals.map((item) => (
+                    <div key={item.id} className="aspect-square">
+                      <SortableAnimalItem
+                        id={item.id}
+                        type={item.type}
+                        number={item.number}
+                        animal={item.animal}
+                        image={item.image}
+                        isPlaced={item.isPlaced}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </Droppable>
-          </div>
+          </motion.div>
+        </div>
+
+        {/* Source Items */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30"
+        >
           <SortableContext items={animalNumbers.map((item) => item.id)}>
-            <div className="grid grid-cols-5 gap-4 my-6">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-0">
               {animalNumbers.map((item) => (
-                <SortableAnimalItem
-                  key={item.id}
-                  id={item.id}
-                  type={item.type}
-                  number={item.number}
-                  animal={item.animal}
-                  image={item.image}
-                />
+                <div key={item.id} className="aspect-square">
+                  <SortableAnimalItem
+                    id={item.id}
+                    type={item.type}
+                    number={item.number}
+                    animal={item.animal}
+                    image={item.image}
+                    isPlaced={item.isPlaced}
+                  />
+                </div>
               ))}
             </div>
           </SortableContext>
-        </DndContext>
+        </motion.div>
+      </DndContext>
 
         {/* Feedback */}
         <AnimatePresence>
@@ -978,14 +1037,13 @@ export default function Activity4({
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: -20 }}
-              className="text-center mb-6"
+              className="text-center mb-6 mt-3"
             >
               <div
-                className={`${
-                  feedback.includes("Tuyệt vời")
+                className={`${feedback.includes("Tuyệt vời")
                     ? "bg-green-100 border-green-300 text-green-700"
                     : "bg-red-100 border-red-300 text-red-700"
-                } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
+                  } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
               >
                 <span>{feedback}</span>
               </div>

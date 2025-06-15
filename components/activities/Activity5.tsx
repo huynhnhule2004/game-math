@@ -72,7 +72,7 @@ export default function Activity5({
           🎯 Hoạt động 5: Đánh số nhà
         </h2>
         <p className="text-lg text-gray-700 bg-white/80 rounded-xl px-6 py-3 shadow-md">
-          Quan sát hình ảnh đường phố bên dưới và trả lời câu hỏi!
+          Quan sát hình ảnh đường phố bên dưới và trả lời câu hỏi! Thực tế người ta đánh số nhà ở đường phố như sau: một bên là số chẵn, một bên là số lẻ. Từ đầu đường đến cuối đường, các số nhà được sắp xếp theo thứ tự từ bé đến lớn
         </p>
 
         {/* Light Bulb Hint Button */}
