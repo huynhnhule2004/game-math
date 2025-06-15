@@ -67,7 +67,7 @@ const SortableAnimalItem = ({ id, type, number, image, animal, isPlaced }: Anima
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    visibility: isPlaced ? "hidden" : "visible", 
+    visibility: isPlaced ? "hidden" : "visible",
     height: "64px",
     width: "100%",
   };
@@ -101,8 +101,9 @@ const Droppable = ({ id, children, title }: { id: string; children: React.ReactN
   return (
     <div
       ref={setNodeRef}
-      className={`p-6 border-2 rounded-xl bg-white/80 min-h-[200px] shadow-sm flex flex-col ${isOver ? "bg-yellow-100 border-yellow-400" : "border-teal-300"
-        }`}
+      className={`p-6 border-2 rounded-xl bg-white/80 min-h-[200px] shadow-sm flex flex-col ${
+        isOver ? "bg-yellow-100 border-yellow-400" : "border-teal-300"
+      }`}
     >
       <h3 className="text-lg font-semibold text-teal-700 mb-4">{title}</h3>
       <div className="flex-1 overflow-y-auto max-h-[300px]">{children}</div>
@@ -247,31 +248,51 @@ export default function Activity4({
       }
       updatedAnimalNumbers[itemIndex] = { ...item, isPlaced: true };
       setEvenAnimals([...evenAnimals, item]);
-      setFeedback("");
+      setFeedback(
+        item.type === "image"
+          ? "Tuyệt vời! Hình được đặt đúng vào số chẵn!"
+          : "Tuyệt vời! Số được đặt đúng vào số chẵn!"
+      );
     } else if (over.id === "odd" && item.number % 2 !== 0) {
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
       updatedAnimalNumbers[itemIndex] = { ...item, isPlaced: true };
       setOddAnimals([...oddAnimals, item]);
-      setFeedback("Tuyệt vời! Bạn đã phân loại đúng!");
+      setFeedback(
+        item.type === "image"
+          ? "Tuyệt vời! Hình được đặt đúng vào số lẻ!"
+          : "Tuyệt vời! Số được đặt đúng vào số lẻ!"
+      );
     } else {
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
       }
-      setFeedback("Sai rồi! Thử lại nhé.");
+      setFeedback(
+        item.type === "image"
+          ? "Sai rồi! Hình này không thuộc nhóm này. Thử lại nhé!"
+          : "Sai rồi! Số này không thuộc nhóm này. Thử lại nhé!"
+      );
       return;
     }
 
     setAnimalNumbers(updatedAnimalNumbers);
 
-    const totalAnimals = animalNumbers.length;
-    const classifiedCount = updatedAnimalNumbers.filter((item) => item.isPlaced).length;
-    if (classifiedCount === totalAnimals) {
+    // Check if all image-based items are correctly placed
+    const imageItems = animalNumbers.filter((item) => item.type === "image");
+    const correctlyPlacedImageCount = updatedAnimalNumbers.filter(
+      (item) =>
+        item.type === "image" &&
+        item.isPlaced &&
+        ((item.number % 2 === 0 && evenAnimals.some((e) => e.id === item.id)) ||
+         (item.number % 2 !== 0 && oddAnimals.some((o) => o.id === item.id)))
+    ).length;
+
+    if (correctlyPlacedImageCount === imageItems.length - 1  && imageItems.length > 0) {
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
-      setFeedback("Tuyệt vời! Bạn đã phân loại đúng tất cả!");
+      setFeedback("Tuyệt vời! Bạn đã phân loại đúng tất cả các hình!");
       setShowCompletionModal(true);
     }
   };
@@ -385,9 +406,10 @@ export default function Activity4({
                 className={`
                   relative p-6 rounded-xl text-center cursor-pointer text-2xl font-bold
                   transition-all duration-300 select-none border-2
-                  ${isSelected
-                    ? "bg-gradient-to-br from-green-400 to-green-500 text-white shadow-lg ring-4 ring-green-200 border-green-300"
-                    : isWrong
+                  ${
+                    isSelected
+                      ? "bg-gradient-to-br from-green-400 to-green-500 text-white shadow-lg ring-4 ring-green-200 border-green-300"
+                      : isWrong
                       ? "bg-gradient-to-br from-red-400 to-red-500 text-white shadow-lg border-red-300"
                       : "bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg border-gray-200 hover:border-purple-300"
                   }
@@ -398,16 +420,16 @@ export default function Activity4({
                 animate={
                   isSelected
                     ? {
-                      scale: [1, 1.1, 1],
-                      rotate: [0, 5, -5, 0],
-                      transition: { duration: 0.6, ease: "easeOut" },
-                    }
+                        scale: [1, 1.1, 1],
+                        rotate: [0, 5, -5, 0],
+                        transition: { duration: 0.6, ease: "easeOut" },
+                      }
                     : isWrong
-                      ? {
+                    ? {
                         x: [-5, 5, -5, 5, 0],
                         transition: { duration: 0.4 },
                       }
-                      : {}
+                    : {}
                 }
                 layout
               >
@@ -490,10 +512,11 @@ export default function Activity4({
               className="text-center mb-6"
             >
               <div
-                className={`${feedback.includes("❌")
+                className={`${
+                  feedback.includes("❌")
                     ? "bg-red-100 border-red-300 text-red-700"
                     : "bg-green-100 border-green-300 text-green-700"
-                  } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
+                } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
               >
                 <span>{feedback}</span>
               </div>
@@ -654,10 +677,11 @@ export default function Activity4({
               className="text-center mt-6"
             >
               <div
-                className={`${feedback.includes("Đúng")
+                className={`${
+                  feedback.includes("Đúng")
                     ? "bg-green-100 border-green-300 text-green-700"
                     : "bg-red-100 border-red-300 text-red-700"
-                  } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
+                } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
               >
                 <span>{feedback}</span>
               </div>
@@ -710,11 +734,7 @@ export default function Activity4({
               <motion.div
                 initial={{ scale: 0.8, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{
-                  scale: 0.8, opacity: 0, y:
-
-                    20
-                }}
+                exit={{ scale: 0.8, opacity: 0, y: 20 }}
                 className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -780,10 +800,11 @@ export default function Activity4({
               className="text-center mb-6"
             >
               <div
-                className={`${feedback.includes("Tuyệt vời")
+                className={`${
+                  feedback.includes("Tuyệt vời")
                     ? "bg-green-100 border-green-300 text-green-700"
                     : "bg-red-100 border-red-300 text-red-700"
-                  } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
+                } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
               >
                 <span>{feedback}</span>
               </div>
@@ -795,7 +816,7 @@ export default function Activity4({
         <div className="text-center">
           <Button
             onClick={checkActivity4_3}
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow,lg"
+            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
           >
             Kiểm tra
           </Button>
@@ -821,9 +842,15 @@ export default function Activity4({
   }
 
   if (activity === 4.4) {
-    // Calculate progress
-    const totalAnimals = animalNumbers.length;
-    const classifiedCount = animalNumbers.filter((item) => item.isPlaced).length;
+    // Calculate progress for images only
+    const totalImages = animalNumbers.filter((item) => item.type === "image").length;
+    const correctlyPlacedImageCount = animalNumbers.filter(
+      (item) =>
+        item.type === "image" &&
+        item.isPlaced &&
+        ((item.number % 2 === 0 && evenAnimals.some((e) => e.id === item.id)) ||
+         (item.number % 2 !== 0 && oddAnimals.some((o) => o.id === item.id)))
+    ).length;
 
     return (
       <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl shadow-lg relative">
@@ -844,7 +871,9 @@ export default function Activity4({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4,">
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+              onClick={() => setShowHint(false)}
+            >
               <motion.div
                 initial={{ scale: 0.8, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -916,16 +945,16 @@ export default function Activity4({
         >
           <h2 className="text-3xl font-bold text-gray-800 mb-3">🎯 Hoạt động 4.4: Phân loại số và hình</h2>
           <p className="text-lg text-gray-600 bg-white/80 rounded-full px-6 py-2 inline-block shadow-sm">
-            Kéo thả các số và hình vào nhóm số chẵn hoặc số lẻ.
+            Kéo các con vật vào ô số chẵn, số lẻ cho phù hợp
           </p>
         </motion.div>
 
         {/* Progress */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-600">Tiến độ</span>
+            <span className="text-sm font-medium text-gray-600">Tiến độ (hình)</span>
             <span className="text-sm font-medium text-teal-600">
-              {classifiedCount}/{totalAnimals} mục
+              {correctlyPlacedImageCount}/{totalImages} hình
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3">
@@ -933,7 +962,7 @@ export default function Activity4({
               className="bg-gradient-to-r from-teal-500 to-cyan-500 h-3 rounded-full"
               initial={{ width: 0 }}
               animate={{
-                width: `${(totalAnimals ? classifiedCount / totalAnimals : 0) * 100}%`,
+                width: `${(totalImages ? correctlyPlacedImageCount / totalImages : 0) * 100}%`,
               }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             />
@@ -942,93 +971,93 @@ export default function Activity4({
 
         {/* Draggable Animal Items and Drop Zones */}
         <DndContext collisionDetection={closestCenter} onDragEnd={handleAnimalDragEnd}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Even Numbers Zone */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Droppable id="even" title="Số chẵn">
-              <div className="min-h-[200px] bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-6 shadow-inner border-2 border-dashed border-blue-300">
-                <h3 className="text-2xl font-bold text-blue-700 mb-4 text-center flex items-center justify-center gap-2">
-                  <span className="text-3xl">🔢</span>
-                  Số chẵn
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[120px]">
-                  {evenAnimals.map((item) => (
-                    <div key={item.id}>
-                      <SortableAnimalItem
-                        id={item.id}
-                        type={item.type}
-                        number={item.number}
-                        animal={item.animal}
-                        image={item.image}
-                        isPlaced={item.isPlaced}
-                      />
-                    </div>
-                  ))}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Even Numbers Zone */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Droppable id="even" title="Số chẵn">
+                <div className="min-h-[200px] bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-6 shadow-inner border-2 border-dashed border-blue-300">
+                  <h3 className="text-2xl font-bold text-blue-700 mb-4 text-center flex items-center justify-center gap-2">
+                    <span className="text-3xl">🔢</span>
+                    Số chẵn
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[120px]">
+                    {evenAnimals.map((item) => (
+                      <div key={item.id}>
+                        <SortableAnimalItem
+                          id={item.id}
+                          type={item.type}
+                          number={item.number}
+                          animal={item.animal}
+                          image={item.image}
+                          isPlaced={item.isPlaced}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </Droppable>
-          </motion.div>
+              </Droppable>
+            </motion.div>
 
-          {/* Odd Numbers Zone */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Droppable id="odd" title="Số lẻ">
-              <div className="min-h-[200px] bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl p-6 shadow-inner border-2 border-dashed border-purple-300">
-                <h3 className="text-2xl font-bold text-purple-700 mb-4 text-center flex items-center justify-center gap-2">
-                  <span className="text-3xl">🎲</span>
-                  Số lẻ
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[120px]">
-                  {oddAnimals.map((item) => (
-                    <div key={item.id}>
-                      <SortableAnimalItem
-                        id={item.id}
-                        type={item.type}
-                        number={item.number}
-                        animal={item.animal}
-                        image={item.image}
-                        isPlaced={item.isPlaced}
-                      />
-                    </div>
-                  ))}
+            {/* Odd Numbers Zone */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <Droppable id="odd" title="Số lẻ">
+                <div className="min-h-[200px] bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl p-6 shadow-inner border-2 border-dashed border-purple-300">
+                  <h3 className="text-2xl font-bold text-purple-700 mb-4 text-center flex items-center justify-center gap-2">
+                    <span className="text-3xl">🎲</span>
+                    Số lẻ
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[120px]">
+                    {oddAnimals.map((item) => (
+                      <div key={item.id}>
+                        <SortableAnimalItem
+                          id={item.id}
+                          type={item.type}
+                          number={item.number}
+                          animal={item.animal}
+                          image={item.image}
+                          isPlaced={item.isPlaced}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </Droppable>
-          </motion.div>
-        </div>
+              </Droppable>
+            </motion.div>
+          </div>
 
-        {/* Source Items */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30"
-        >
-          <SortableContext items={animalNumbers.map((item) => item.id)}>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-              {animalNumbers.map((item) => (
-                <div key={item.id} >
-                  <SortableAnimalItem
-                    id={item.id}
-                    type={item.type}
-                    number={item.number}
-                    animal={item.animal}
-                    image={item.image}
-                    isPlaced={item.isPlaced}
-                  />
-                </div>
-              ))}
-            </div>
-          </SortableContext>
-        </motion.div>
-      </DndContext>
+          {/* Source Items */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30"
+          >
+            <SortableContext items={animalNumbers.map((item) => item.id)}>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                {animalNumbers.map((item) => (
+                  <div key={item.id}>
+                    <SortableAnimalItem
+                      id={item.id}
+                      type={item.type}
+                      number={item.number}
+                      animal={item.animal}
+                      image={item.image}
+                      isPlaced={item.isPlaced}
+                    />
+                  </div>
+                ))}
+              </div>
+            </SortableContext>
+          </motion.div>
+        </DndContext>
 
         {/* Feedback */}
         <AnimatePresence>
@@ -1040,10 +1069,11 @@ export default function Activity4({
               className="text-center mb-6 mt-3"
             >
               <div
-                className={`${feedback.includes("Tuyệt vời")
+                className={`${
+                  feedback.includes("Tuyệt vời")
                     ? "bg-green-100 border-green-300 text-green-700"
                     : "bg-red-100 border-red-300 text-red-700"
-                  } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
+                } border-2 px-6 py-3 rounded-full inline-flex items-center space-x-2 text-lg font-semibold shadow-lg`}
               >
                 <span>{feedback}</span>
               </div>
