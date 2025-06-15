@@ -69,7 +69,7 @@ const SortableAnimalItem = ({ id, type, number, image, animal, isPlaced }: Anima
     transition,
     visibility: isPlaced ? "hidden" : "visible", 
     height: "64px",
-    width: "64px",
+    width: "100%",
   };
   return (
     <div
@@ -957,7 +957,7 @@ export default function Activity4({
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[120px]">
                   {evenAnimals.map((item) => (
-                    <div key={item.id} className="aspect-square">
+                    <div key={item.id}>
                       <SortableAnimalItem
                         id={item.id}
                         type={item.type}
@@ -987,7 +987,7 @@ export default function Activity4({
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[120px]">
                   {oddAnimals.map((item) => (
-                    <div key={item.id} className="aspect-square">
+                    <div key={item.id}>
                       <SortableAnimalItem
                         id={item.id}
                         type={item.type}
@@ -1012,9 +1012,9 @@ export default function Activity4({
           className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30"
         >
           <SortableContext items={animalNumbers.map((item) => item.id)}>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-0">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
               {animalNumbers.map((item) => (
-                <div key={item.id} className="aspect-square">
+                <div key={item.id} >
                   <SortableAnimalItem
                     id={item.id}
                     type={item.type}
