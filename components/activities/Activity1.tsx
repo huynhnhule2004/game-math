@@ -226,7 +226,7 @@ export default function Activity1({
           transition={{ duration: 0.8 }}
         >
           <motion.h2
-            className="pb-2 text-4xl sm:text-5xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-6 drop-shadow-lg"
+            className="pb-2 text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-6 drop-shadow-lg"
             animate={{
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
             }}
@@ -236,7 +236,7 @@ export default function Activity1({
               ease: "easeInOut"
             }}
           >
-            🐱 Hoạt động 1: &quot;Chia cá for mèo&quot; 🐟
+            🐱 Hoạt động 1: &quot;Chia cá cho mèo&quot; 🐟
             
           </motion.h2>
         </motion.div>
@@ -266,7 +266,7 @@ export default function Activity1({
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-5 gap-4 sm:gap-6 md:gap-10 lg:gap-12 mb-12 justify-items-center max-w-7xl mx-auto"
+          className="grid grid-cols-2 md:grid-cols-5 gap-4 sm:gap-6 md:gap-10 lg:gap-12 mb-12 justify-items-center max-w-7xl mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, staggerChildren: 0.1 }}
@@ -295,7 +295,7 @@ export default function Activity1({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -50, scale: 0.8 }}
               className={`
-                text-center p-8 rounded-3xl shadow-2xl mb-8 border-4 transition-all duration-500 mx-auto
+                text-center p-8 rounded-3xl shadow-2xl mb-[200px] md:mb-8 border-4 transition-all duration-500 mx-auto
                 ${feedback.includes("Tuyệt vời") || feedback.includes("Tốt lắm")
                   ? "bg-gradient-to-r from-green-100 via-green-200 to-green-300 border-green-400 shadow-green-300/60"
                   : "bg-gradient-to-r from-red-100 via-red-200 to-red-300 border-red-400 shadow-red-300/60"

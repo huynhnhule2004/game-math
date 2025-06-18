@@ -105,7 +105,7 @@ export default function Activity3({
       </div>
 
       {/* Numbers Grid */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         {[...Array(20).keys()].map((i) => i + 1).map((num) => (
           <motion.div
             key={num}
@@ -232,7 +232,7 @@ export default function Activity3({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 30 }}
               transition={{ duration: 0.6, ease: "backOut" }}
-              className="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-2xl p-6 text-center shadow-lg max-w-lg w-full mx-4"
+              className="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-2xl p-6 text-center shadow-lg max-w-xs md:max-w-lg w-full mx-4"
             >
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
@@ -251,16 +251,16 @@ export default function Activity3({
                   • Các số có tận cùng là <span className="bg-blue-200 px-2 py-1 rounded font-bold">1, 3, 5, 7, 9</span> là <span className="text-blue-600 font-bold">số lẻ</span>
                 </p>
               </div>
-              <div className="flex space-x-4 justify-center">
+              <div className="flex space-x-2 md:space-x-4 justify-center">
                 <Button
                   onClick={() => setShowConclusion(false)}
-                  className="px-6 py-3 text-lg font-bold rounded-2xl bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all duration-300"
+                  className="px-6 py-3 text-xs md:text-lg font-bold rounded-2xl bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all duration-300"
                 >
                   Đóng
                 </Button>
                 <Button
                   onClick={handleNextActivity}
-                  className="px-8 py-3 text-lg font-bold rounded-2xl transition-all duration-300 transform bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 hover:from-blue-500 hover:via-purple-600 hover:to-blue-700 text-white hover:scale-105 shadow-xl hover:shadow-2xl"
+                  className="px-8 py-3 text-xs md:text-lg font-bold rounded-2xl transition-all duration-300 transform bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 hover:from-blue-500 hover:via-purple-600 hover:to-blue-700 text-white hover:scale-105 shadow-xl hover:shadow-2xl"
                 >
                   Hoạt động tiếp theo 🚀
                 </Button>

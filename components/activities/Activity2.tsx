@@ -150,7 +150,7 @@ export default function Activity2({
 
       {/* Conclusion Dialog */}
       <Dialog open={showConclusion} onOpenChange={setShowConclusion}>
-        <DialogContent className="!max-w-xl mx-auto bg-gradient-to-br from-green-50 to-emerald-50 border-4 border-green-300 rounded-3xl shadow-2xl">
+        <DialogContent className="max-w-xs md:!max-w-xl mx-auto bg-gradient-to-br from-green-50 to-emerald-50 border-4 border-green-300 rounded-3xl shadow-2xl">
           <DialogHeader className="text-center">
             <motion.div
               initial={{ scale: 0, rotate: -180 }}

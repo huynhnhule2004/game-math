@@ -131,19 +131,18 @@ export default function MathGame() {
         </CardHeader>
         <CardContent>
           {/* Navigation Bar */}
-          <div className="flex justify-center space-x-4 mb-8">
+          <div className="flex flex-col items-center space-y-3 mb-8 sm:flex-row sm:justify-center sm:space-x-4 sm:space-y-0">
             {[1, 2, 3, 4, 5].map((act) => (
               <Button
                 key={act}
                 onClick={() => handleNavClick(act)}
                 disabled={!unlockedActivities.includes(act)}
-                className={`${
-                  activity === act
+                className={`${activity === act
                     ? "bg-blue-600 text-white"
                     : unlockedActivities.includes(act)
-                    ? "bg-blue-400 hover:bg-blue-500 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                } px-6 py-2 text-lg font-semibold rounded-full transition-all`}
+                      ? "bg-blue-400 hover:bg-blue-500 text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  } px-6 py-2 text-lg font-semibold rounded-full transition-all`}
               >
                 Hoạt động {act}
               </Button>
@@ -174,7 +173,7 @@ export default function MathGame() {
             <Activity3
               evenNumbers={evenNumbers}
               setEvenNumbers={setEvenNumbers}
-              feedback={feedback}
+              feedback=''
               setFeedback={setFeedback}
               showConclusion={showConclusion}
               setShowConclusion={setShowConclusion}

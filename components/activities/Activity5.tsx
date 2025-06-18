@@ -98,11 +98,11 @@ export default function Activity5({
             <img
               src="/imgs/street.jpg"
               alt="Đường phố với các ngôi nhà"
-              className="w-full h-64 md:h-[500px] object-fill"
+              className="w-full h-32 md:h-[500px] object-fill"
             />
 
             {/* Overlay labels để chỉ rõ bên trái và bên phải */}
-            <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-full font-bold shadow-lg">
+            {/* <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-full font-bold shadow-lg">
               ← BÊN TRÁI: SỐ LẺ
             </div>
             <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-2 rounded-full font-bold shadow-lg">
@@ -110,9 +110,9 @@ export default function Activity5({
             </div>
 
             {/* Mũi tên chỉ hướng */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+            {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
               ↑ HƯỚNG ĐI TỪ BÉ ĐẾN LỚN ↑
-            </div>
+            </div> */} 
           </div>
 
           <p className="text-center mt-3 text-gray-600 font-medium">

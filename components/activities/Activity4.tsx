@@ -319,7 +319,7 @@ export default function Activity4({
         {/* Light Bulb Hint Button */}
         <motion.button
           onClick={() => setShowHint(!showHint)}
-          className="absolute top-4 right-4 p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-300 z-10"
+          className="absolute top-0 right-0 md:top-4 md:right-4 p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-300 z-10"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -367,7 +367,7 @@ export default function Activity4({
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h2 className="text-3xl font-bold text-gray-800 mb-3">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
             🎯 Hoạt động 4.1: Chọn số lẻ
           </h2>
           <p className="text-lg text-gray-600 bg-white/80 rounded-full px-6 py-2 inline-block shadow-sm">
@@ -394,7 +394,7 @@ export default function Activity4({
         </div>
 
         {/* Numbers Grid */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           {numbers.map((num) => {
             const isSelected = oddNumbers.includes(num);
             const isWrong = wrongNumbers.includes(num);
@@ -533,7 +533,7 @@ export default function Activity4({
           >
             <Button
               onClick={() => setActivity(4.2)}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 text-xs md:text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
             >
               🎉 Tiếp tục hoạt động tiếp theo
             </Button>
@@ -553,7 +553,7 @@ export default function Activity4({
         {/* Light Bulb Hint Button */}
         <motion.button
           onClick={() => setShowHint(!showHint)}
-          className="absolute top-4 right-4 p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-300 z-10"
+          className="absolute top-0 right-0 md:top-4 md:right-4 p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-300 z-10"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -698,7 +698,7 @@ export default function Activity4({
           >
             <Button
               onClick={() => setActivity(4.3)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-8 py-3 text-xs md:text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
             >
               🎉 Tiếp tục hoạt động tiếp theo
             </Button>
@@ -714,7 +714,7 @@ export default function Activity4({
         {/* Light Bulb Hint Button */}
         <motion.button
           onClick={() => setShowHint(!showHint)}
-          className="absolute top-4 right-4 p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-300 z-10"
+          className="absolute top-0 right-0 md:top-4 md:right-4 p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-300 z-10"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -831,7 +831,7 @@ export default function Activity4({
           >
             <Button
               onClick={() => setActivity(4.4)}
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
+              className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 text-xs md:text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
             >
               🎉 Tiếp tục hoạt động tiếp theo
             </Button>
@@ -857,7 +857,7 @@ export default function Activity4({
         {/* Light Bulb Hint Button */}
         <motion.button
           onClick={() => setShowHint(!showHint)}
-          className="absolute top-4 right-4 p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-300 z-10"
+          className="absolute top-0 right-0 md:top-4 md:right-4 p-3 bg-yellow-400 hover:bg-yellow-500 rounded-full shadow-lg transition-all duration-300 z-10"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
