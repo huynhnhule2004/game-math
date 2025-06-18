@@ -404,13 +404,13 @@ export default function Activity1({
                 <div className="flex space-x-4 justify-center">
                   <Button
                     onClick={() => setShowModal(false)}
-                    className="px-6 py-3 text-lg font-bold rounded-2xl bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all duration-300"
+                    className="px-6 py-3 text-xs md:text-lg font-bold rounded-2xl bg-gray-200 hover:bg-gray-300 text-gray-800 transition-all duration-300"
                   >
                     Đóng
                   </Button>
                   <Button
                     onClick={handleNextActivity}
-                    className="px-8 py-3 text-lg font-bold rounded-2xl transition-all duration-300 transform bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 hover:from-blue-500 hover:via-purple-600 hover:to-blue-700 text-white hover:scale-105 shadow-xl hover:shadow-2xl"
+                    className="px-8 py-3 text-xs md:text-lg font-bold rounded-2xl transition-all duration-300 transform bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 hover:from-blue-500 hover:via-purple-600 hover:to-blue-700 text-white hover:scale-105 shadow-xl hover:shadow-2xl"
                   >
                     Hoạt động tiếp theo 🚀
                   </Button>

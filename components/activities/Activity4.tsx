@@ -10,7 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DndContext, closestCenter, DragEndEvent, useDroppable } from "@dnd-kit/core";
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  rectIntersection,
+  DragEndEvent,
+  useDroppable,
+} from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Lightbulb, X } from "lucide-react";
@@ -43,51 +52,71 @@ interface Activity4Props {
   setAnimalNumbers: React.Dispatch<React.SetStateAction<AnimalNumber[]>>;
 }
 
-const SortableItem = ({ id }: { id: number }) => {
+const SortableItem: React.FC<{ id: number }> = ({ id }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-  const style = {
+
+  const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
+    touchAction: "none", // Ngăn scroll trên mobile
+    userSelect: "none", // Ngăn chọn văn bản
   };
+
   return (
     <motion.div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      className="p-4 border rounded-lg bg-white"
+      className={`w-16 h-16 flex items-center justify-center text-xl font-semibold bg-white rounded-lg shadow-md cursor-grab active:cursor-grabbing ${
+        transform ? "scale-110 shadow-xl z-50" : ""
+      }`}
+      onTouchStart={(e) => {
+        e.preventDefault(); // Ngăn các sự kiện cảm ứng mặc định
+        console.log(`Touch start on item ${id}`); // Debug
+      }}
     >
       {id}
     </motion.div>
   );
 };
 
-const SortableAnimalItem = ({ id, type, number, image, animal, isPlaced }: AnimalNumber) => {
+const SortableAnimalItem: React.FC<AnimalNumber> = ({ id, type, number, image, animal, isPlaced }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
+    touchAction: "none", // Ngăn scroll trên mobile
+    userSelect: "none", // Ngăn chọn văn bản
     visibility: isPlaced ? "hidden" : "visible",
-    height: "64px",
+    height: "80px",
     width: "100%",
   };
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      className="p-4 border rounded-lg bg-white flex items-center justify-center"
+      className={`flex items-center justify-center p-4 border rounded-lg bg-white shadow-md cursor-grab active:cursor-grabbing ${
+        transform ? "scale-110 shadow-xl z-50" : ""
+      }`}
+      onTouchStart={(e) => {
+        e.preventDefault(); // Ngăn các sự kiện cảm ứng mặc định
+        console.log(`Touch start on animal item ${id}`); // Debug
+      }}
     >
       {type === "number" ? (
-        <span className="text-lg font-semibold">{number}</span>
+        <span className="text-xl font-semibold">{number}</span>
       ) : (
         image && (
           <Image
             src={image}
             alt={animal || "animal"}
-            width={32}
-            height={32}
+            width={48}
+            height={48}
             className="object-contain"
           />
         )
@@ -96,8 +125,13 @@ const SortableAnimalItem = ({ id, type, number, image, animal, isPlaced }: Anima
   );
 };
 
-const Droppable = ({ id, children, title }: { id: string; children: React.ReactNode; title: string }) => {
+const Droppable: React.FC<{ id: string; children: React.ReactNode; title: string }> = ({
+  id,
+  children,
+  title,
+}) => {
   const { setNodeRef, isOver } = useDroppable({ id });
+
   return (
     <div
       ref={setNodeRef}
@@ -111,7 +145,7 @@ const Droppable = ({ id, children, title }: { id: string; children: React.ReactN
   );
 };
 
-export default function Activity4({
+const Activity4: React.FC<Activity4Props> = ({
   activity,
   setActivity,
   oddNumbers,
@@ -125,8 +159,13 @@ export default function Activity4({
   setLargestOdd,
   animalNumbers,
   setAnimalNumbers,
-}: Activity4Props) {
-  const [answers4_2, setAnswers4_2] = useState({
+}) => {
+  const [answers4_2, setAnswers4_2] = useState<{
+    q1: string;
+    q2: string;
+    q3: string;
+    q3_type: string;
+  }>({
     q1: "",
     q2: "",
     q3: "",
@@ -134,9 +173,9 @@ export default function Activity4({
   });
   const [evenAnimals, setEvenAnimals] = useState<AnimalNumber[]>([]);
   const [oddAnimals, setOddAnimals] = useState<AnimalNumber[]>([]);
-  const [showHint, setShowHint] = useState(false);
+  const [showHint, setShowHint] = useState<boolean>(false);
   const [wrongNumbers, setWrongNumbers] = useState<number[]>([]);
-  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState<boolean>(false);
 
   // Initialize audio objects
   const correctSound = typeof Audio !== "undefined" ? new Audio("/sounds/correct.mp3") : null;
@@ -189,6 +228,7 @@ export default function Activity4({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    console.log(`Drag end: active=${active.id}, over=${over?.id}`); // Debug
     if (active.id !== over?.id) {
       setDragNumbers((items) => {
         const oldIndex = items.indexOf(active.id as number);
@@ -222,6 +262,7 @@ export default function Activity4({
 
   const handleAnimalDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    console.log(`Animal drag end: active=${active.id}, over=${over?.id}`); // Debug
     if (!over) {
       if (wrongSound) {
         wrongSound.play().catch((e) => console.log("Error playing wrong sound:", e));
@@ -278,7 +319,6 @@ export default function Activity4({
 
     setAnimalNumbers(updatedAnimalNumbers);
 
-    // Check if all image-based items are correctly placed
     const imageItems = animalNumbers.filter((item) => item.type === "image");
     const correctlyPlacedImageCount = updatedAnimalNumbers.filter(
       (item) =>
@@ -288,7 +328,7 @@ export default function Activity4({
          (item.number % 2 !== 0 && oddAnimals.some((o) => o.id === item.id)))
     ).length;
 
-    if (correctlyPlacedImageCount === imageItems.length - 1  && imageItems.length > 0) {
+    if (correctlyPlacedImageCount === imageItems.length - 1 && imageItems.length > 0) {
       if (correctSound) {
         correctSound.play().catch((e) => console.log("Error playing correct sound:", e));
       }
@@ -307,10 +347,26 @@ export default function Activity4({
         <p className="font-semibold text-blue-800 mb-2">📘 Nhớ lại:</p>
         <p>Những số chia hết cho 2 là số chẵn.</p>
         <p>Những số không chia hết cho 2 là số lẻ.</p>
-        <p>Các chữ số có tận cùng là <span className="font-bold text-green-500">0, 2, 4, 6, 8</span> là số chẵn.</p>
-        <p>Các chữ số có tận cùng là <span className="font-bold text-red-500">1, 3, 5, 7, 9</span> là số lẻ.</p>
+        <p>
+          Các chữ số có tận cùng là{" "}
+          <span className="font-bold text-green-500">0, 2, 4, 6, 8</span> là số chẵn.
+        </p>
+        <p>
+          Các chữ số có tận cùng là{" "}
+          <span className="font-bold text-red-500">1, 3, 5, 7, 9</span> là số lẻ.
+        </p>
       </div>
     </div>
+  );
+
+  // Cấu hình sensors cho kéo thả trên mobile
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 0, tolerance: 8 },
+    })
   );
 
   if (activity === 4) {
@@ -469,7 +525,9 @@ export default function Activity4({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: showHint ? 0.8 : 0 }}
                 >
-                  <span className={`px-1 py-0.5 rounded ${isOdd ? "bg-orange-200" : "bg-blue-200"}`}>
+                  <span
+                    className={`px-1 py-0.5 rounded ${isOdd ? "bg-orange-200" : "bg-blue-200"}`}
+                  >
                     {num.toString().slice(-1)}
                   </span>
                 </motion.div>
@@ -544,9 +602,9 @@ export default function Activity4({
   }
 
   if (activity === 4.2) {
-    function estopPropagation(): void {
-      throw new Error("Function not implemented.");
-    }
+    const estopPropagation = (e: React.MouseEvent): void => {
+      e.stopPropagation();
+    };
 
     return (
       <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg relative">
@@ -575,7 +633,7 @@ export default function Activity4({
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.8, opacity: 0, y: 20 }}
                 className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
-                onClick={() => estopPropagation()}
+                onClick={estopPropagation}
               >
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -610,7 +668,9 @@ export default function Activity4({
               </SelectTrigger>
               <SelectContent>
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                  <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
+                  <SelectItem key={num} value={num.toString()}>
+                    {num}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -626,7 +686,9 @@ export default function Activity4({
               </SelectTrigger>
               <SelectContent>
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                  <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
+                  <SelectItem key={num} value={num.toString()}>
+                    {num}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -652,7 +714,9 @@ export default function Activity4({
               </SelectTrigger>
               <SelectContent>
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                  <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
+                  <SelectItem key={num} value={num.toString()}>
+                    {num}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -710,7 +774,7 @@ export default function Activity4({
 
   if (activity === 4.3) {
     return (
-      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg relative">
+      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg relative touch-none">
         {/* Light Bulb Hint Button */}
         <motion.button
           onClick={() => setShowHint(!showHint)}
@@ -770,14 +834,17 @@ export default function Activity4({
         </motion.div>
 
         {/* Draggable Numbers */}
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext sensors={sensors} collisionDetection={rectIntersection} onDragEnd={handleDragEnd}>
           <SortableContext items={dragNumbers}>
-            <div className="flex gap-4 my-6 justify-center">
+            <div
+              className="flex gap-4 my-6 justify-center overflow-hidden touch-none"
+              style={{ touchAction: "none" }}
+            >
               {dragNumbers.map((num) => (
                 <SortableItem key={num} id={num} />
               ))}
             </div>
-          </SortableContext>
+            </SortableContext>
         </DndContext>
 
         {/* Current Number Display */}
@@ -853,7 +920,7 @@ export default function Activity4({
     ).length;
 
     return (
-      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl shadow-lg relative">
+      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl shadow-lg relative touch-none">
         {/* Light Bulb Hint Button */}
         <motion.button
           onClick={() => setShowHint(!showHint)}
@@ -962,7 +1029,7 @@ export default function Activity4({
               className="bg-gradient-to-r from-teal-500 to-cyan-500 h-3 rounded-full"
               initial={{ width: 0 }}
               animate={{
-                width: `${(totalImages ? correctlyPlacedImageCount / totalImages : 0) * 100}%`,
+                width: `${totalImages ? (correctlyPlacedImageCount / totalImages) * 100 : 0}%`,
               }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             />
@@ -970,7 +1037,11 @@ export default function Activity4({
         </div>
 
         {/* Draggable Animal Items and Drop Zones */}
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleAnimalDragEnd}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={rectIntersection}
+          onDragEnd={handleAnimalDragEnd}
+        >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Even Numbers Zone */}
             <motion.div
@@ -1038,7 +1109,8 @@ export default function Activity4({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30"
+            className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30 overflow-hidden touch-none"
+            style={{ touchAction: "none" }}
           >
             <SortableContext items={animalNumbers.map((item) => item.id)}>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
@@ -1085,4 +1157,6 @@ export default function Activity4({
   }
 
   return null;
-}
+};
+
+export default Activity4;

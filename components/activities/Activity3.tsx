@@ -211,7 +211,7 @@ export default function Activity3({
         >
           <Button
             onClick={handleNextActivity}
-            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-3 text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-3 text-xs md:text-lg font-semibold rounded-full transform transition-all duration-200 hover:scale-105 shadow-lg"
           >
             🎉 Tiếp tục hoạt động tiếp theo
           </Button>
